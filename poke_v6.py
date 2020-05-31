@@ -94,7 +94,6 @@ class Game :
 		if Game.check_collision(self.big_dot, self.small_dot ) :
 			if not self.big_dot.dot_collision :
 				Dot.change_velocities( self.big_dot, self.small_dot )
-			else : 
 				self.big_dot.dot_collision = True
 				self.big_dot.dot_collision = True
 		else :
