@@ -92,7 +92,14 @@ class Game :
 		self.clock.tick(self.frame_rate)
 		self.score = get_ticks() // 1000
 		if Game.check_collision(self.big_dot, self.small_dot ) :
+			if not self.big_dot.dot_collision :
 				Dot.change_velocities( self.big_dot, self.small_dot )
+			else : 
+				self.big_dot.dot_collision = True
+				self.big_dot.dot_collision = True
+		else :
+			self.big_dot.dot_collision = False
+			self.big_dot.dot_collision = False
 
 	def handle_mouse_up( self ) :
 		# this makes handle events more readable and maintainable
@@ -122,6 +129,9 @@ class Dot :
 		self._radius = radius
 		self._center =  center
 		self._velocity = velocity
+		self.edge_collision = [False, False]	# otherwise you're stuck oscillating
+												# for the case of low velocity
+		self.dot_collision = False
 		
 	def get_center( self ) :
 		return self._center
@@ -154,7 +164,11 @@ class Dot :
 		for index in range(2) :
 			self._center[index] += self._velocity[index]
 			if self._center[index] - self._radius < 0 or self._center[index] + self._radius > size[index] :
-				self._velocity[index] = -self._velocity[index]
+				if not self.edge_collision[index] :
+					self._velocity[index] = -self._velocity[index]
+					self.edge_collision[index] = True
+			else :
+				self.edge_collision[index] = False
 	
 	# draw a filled circle at specified loction with size/color
 	def draw_dot( self ) :
