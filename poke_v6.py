@@ -4,7 +4,6 @@ from pygame.event import get as get_events
 from pygame import QUIT, MOUSEBUTTONUP, Color, init as start_clock
 from pygame.draw import circle as draw_circle
 from random import randint
-import numpy as np
 
 # version 1 of Poke the dots. This version only displays two dots moving endlessly
 
@@ -70,7 +69,6 @@ class Game :
 	# draw dots and refresh display
 	def draw_game(self) :
 		self._window.clear()
-		self.draw_score(  )
 		self.small_dot.draw_dot( )
 		self.big_dot.draw_dot( )
 		self._window.update()
@@ -93,6 +91,8 @@ class Game :
 		# control frame rate
 		self.clock.tick(self.frame_rate)
 		self.score = get_ticks() // 1000
+		if Game.check_collision(self.big_dot, self.small_dot ) :
+				Dot.change_velocities( self.big_dot, self.small_dot )
 
 	def handle_mouse_up( self ) :
 		# this makes handle events more readable and maintainable
@@ -106,10 +106,7 @@ class Game :
 		c2 = dot2.get_center()
 		r1 = dot1.get_radius()
 		r2 = dot2.get_radius()
-		if ( c1[0] - c2[0] )**2 + ( c1[1] - c2[1] )**2 < (r1 + r2)**2 :
-			return True
-		else :
-			return False
+		return ( c1[0] - c2[0] )**2 + ( c1[1] - c2[1] )**2 < (r1 + r2)**2 
 	
 	
 class Dot :
@@ -123,12 +120,21 @@ class Dot :
 		self._window = window
 		self._color = color
 		self._radius = radius
-		self._center = np.array( center )
-		self._velocity = np.array( velocity )
+		self._center =  center
+		self._velocity = velocity
 		
-# from https://scipython.com/blog/two-dimensional-collisions/
+	def get_center( self ) :
+		return self._center
+		
+	def get_radius( self ) :
+		return self._radius
+		
 	def intersects( self, other ) :
-		return np.hypot( *(self._center - other._center ) ) < self.radius + other.radius
+		c1 = self.get_center()
+		c2 = other.get_center()
+		r1 = self.get_radius()
+		r2 = other.get_radius()
+		return ( c1[0] - c2[0] )**2 + ( c1[1] - c2[1] )**2 < (r1 + r2)**2 
 
 	def randomize_dot( self ) :
 		# given a dot object, use window height and width and radius to set the
@@ -167,15 +173,23 @@ class Dot :
 		m1, m2 = p1._radius**3, p2._radius**3 	# assuming spheres
 		
 		M = m1 + m2
-		r1, r2 = p1._radius, p2._radius
-		d = np.linalg.norm(r1 - r2)**2
+		c1, c2 = p1._center, p2._center
+		d2 = ( c1[0] - c2[0] )**2 + ( c1[1] - c2[1] )**2
 		v1, v2 = p1._velocity, p2._velocity
-		u1 = v1 - 2*m2 / M * np.dot(v1-v2, r1-r2) / d * (r1 - r2)
-		u2 = v2 - 2*m1 / M * np.dot(v2-v1, r2-r1) / d * (r2 - r1)
+		v1_v2 = [x-y for x,y in zip( v1, v2 ) ]
+		x1_x2 = [x-y for x,y in zip( c1, c2 ) ]
+		dot_pr = sum( [x*y for x,y in zip( v1_v2, x1_x2 )] )
+		u1 = [x - 2*m2 // M * dot_pr // d2 * y for x,y in zip( v1, x1_x2 ) ]
+		u2 = [x + 2*m1 // M * dot_pr // d2 * y for x,y in zip( v2, x1_x2 ) ]
 		p1._velocity = u1
 		p2._velocity = u2
 
 
+class Vector :
+	# done just to manage two dimensional arrays easily - that is, use + and - with them..
+	
+	def __init__( self, xy_list ) :
+		self.xy = xy_list	# expected to be a two element list or tuple
 
 # start the program running
 main()
