@@ -33,8 +33,8 @@ class Game :
 		self.score = 0
 		self.small_dot = Dot( self._window, 'red', [100,200], 30, [1,2])
 		self.big_dot = Dot( self._window, 'blue', [200,100], 40, [2,1])
-		self.small_dot.randomize_dot( )
-		self.big_dot.randomize_dot( )
+#		self.small_dot.randomize_dot( )
+#		self.big_dot.randomize_dot( )
 
 	def _create_window() :	# return a window object
 		#	return window
