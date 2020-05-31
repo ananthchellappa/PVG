@@ -179,8 +179,8 @@ class Dot :
 		v1_v2 = [x-y for x,y in zip( v1, v2 ) ]
 		x1_x2 = [x-y for x,y in zip( c1, c2 ) ]
 		dot_pr = sum( [x*y for x,y in zip( v1_v2, x1_x2 )] )
-		u1 = [x - 2*m2 // M * dot_pr // d2 * y for x,y in zip( v1, x1_x2 ) ]
-		u2 = [x + 2*m1 // M * dot_pr // d2 * y for x,y in zip( v2, x1_x2 ) ]
+		u1 = [x - 2*m2 * dot_pr * y // (M* d2) for x,y in zip( v1, x1_x2 ) ]
+		u2 = [x + 2*m1 * dot_pr * y // (M* d2) for x,y in zip( v2, x1_x2 ) ]
 		p1._velocity = u1
 		p2._velocity = u2
 
