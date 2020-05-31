@@ -152,7 +152,7 @@ class Dot :
 		size = ( self._window.get_width(), self._window.get_height() )
 
 		for index in range(2) :
-			self._center[index] += int( self._velocity[index] )
+			self._center[index] += self._velocity[index]
 			if self._center[index] - self._radius < 0 or self._center[index] + self._radius > size[index] :
 				self._velocity[index] = -self._velocity[index]
 	
@@ -160,7 +160,7 @@ class Dot :
 	def draw_dot( self ) :
 		surface = self._window.get_surface()
 		color = Color( self._color )
-		draw_circle( surface, color, self._center, self._radius )
+		draw_circle( surface, color, [int(self._center[0]),int(self._center[1])], self._radius )
 		
 # from https://scipython.com/blog/two-dimensional-collisions/
 	def change_velocities(p1, p2):
